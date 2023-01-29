@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Runtime.InteropServices;
+using WebApplication1.Models.DTO;
 using WebApplication1.Repositories;
 
 namespace WebApplication1.Controllers
@@ -48,8 +49,8 @@ namespace WebApplication1.Controllers
                 {
                     return NotFound();
                 }
-                var regionDTO = mapper.Map<Models.DTO.item>(item);
-                return Ok(regionDTO);
+                var itemDTO = mapper.Map<Models.DTO.item>(item);
+                return Ok(itemDTO);
             }
 
         }
@@ -77,8 +78,80 @@ namespace WebApplication1.Controllers
                 price = item.price
 
             };
+            return Ok(itemDTO);
 
-            return CreatedAtAction(nameof(GetItemAsync), new { itemId = itemDTO.itemId }, itemDTO);
+            //return CreatedAtAction(nameof(GetItemAsync), new { itemId = itemDTO.itemId }, itemDTO);
         }
+
+        [HttpDelete]
+        [Route("{itemId:guid}")]
+        public async Task<IActionResult> DeleteItemAsymc(Guid itemId)
+        {
+            // Get item from database
+            var item = await itemRepository.DeleteAsync(itemId);
+
+
+            // If null NotFound
+            if (itemId == null)
+            {
+                return NotFound();
+            }
+
+
+            // Convert response back to DTO
+
+            var itemDTO = new Models.DTO.item
+            {
+                itemId = item.itemId,
+                name = item.name,
+                price = item.price
+
+            };
+
+
+            // return Ok response
+            return Ok(itemDTO);
+
+        }
+
+        [HttpPut]
+        [Route("{itemId:guid}")]
+        public async Task<IActionResult> UpdateItem([FromRoute]Guid itemId, [FromBody] Models.DTO.UpdateItemRequest updateItem)
+        {
+            // convert DTO to Domain model
+
+            var item = new Models.Domain.Item()
+            {
+                name = updateItem.name,
+                price = updateItem.price
+
+            };
+
+            //Update Item using repository
+
+              item= await itemRepository.UpdateAsync(itemId, item);
+
+
+            //if null then notfound
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            //convert domain back to DTO
+            var itemDTO = new Models.DTO.item
+            {
+                itemId = item.itemId,
+                name = item.name,
+                price = item.price
+
+            };
+
+            //return ok responce
+            return Ok(itemDTO);
+
+
+        }
+
     }
 }

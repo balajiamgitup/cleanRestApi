@@ -23,9 +23,19 @@ namespace WebApplication1.Repositories
             return items;
         }
 
-        public Task<Item> DeleteAsync(Guid itemID)
+        public async Task<Item> DeleteAsync(Guid itemID)
         {
-            throw new NotImplementedException();
+            var item = await restDbContext.item.FirstOrDefaultAsync(x => x.itemId == itemID);
+
+            if (item == null)
+            {
+                return null;
+            }
+
+            // Delete the item 
+            restDbContext.item.Remove(item);
+            await restDbContext.SaveChangesAsync();
+            return item;
         }
 
         public async Task<IEnumerable<Item>> GetAllAsync()
@@ -38,9 +48,21 @@ namespace WebApplication1.Repositories
             return await restDbContext.item.FirstOrDefaultAsync(x => x.itemId == ItemID);
         }
 
-        public Task<Item> UpdateAsync(Guid itemID, Item items)
+        public async Task<Item> UpdateAsync(Guid itemID, Item items)
         {
-            throw new NotImplementedException();
+            var existingItem = await restDbContext.item.FirstOrDefaultAsync(x => x.itemId == itemID);
+            if (existingItem == null)
+            {
+                return null;
+            }
+
+            existingItem.name = items.name;
+            existingItem.price = items.price;
+
+            await restDbContext.SaveChangesAsync();
+
+            return existingItem;
+
         }
     }
 }

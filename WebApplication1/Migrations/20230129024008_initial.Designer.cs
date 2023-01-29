@@ -12,7 +12,7 @@ using WebApplication1.Data;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(RestDbContext))]
-    [Migration("20230126134900_initial")]
+    [Migration("20230129024008_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -24,6 +24,24 @@ namespace WebApplication1.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("WebApplication1.Models.Domain.Item", b =>
+                {
+                    b.Property<Guid>("itemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("price")
+                        .HasColumnType("int");
+
+                    b.HasKey("itemId");
+
+                    b.ToTable("item");
+                });
 
             modelBuilder.Entity("WebApplication1.Models.Domain.bill", b =>
                 {
@@ -42,24 +60,6 @@ namespace WebApplication1.Migrations
                     b.HasIndex("orderItemId");
 
                     b.ToTable("bill");
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.Domain.item", b =>
-                {
-                    b.Property<Guid>("itemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("price")
-                        .HasColumnType("int");
-
-                    b.HasKey("itemId");
-
-                    b.ToTable("item");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Domain.order", b =>
@@ -146,8 +146,8 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("WebApplication1.Models.Domain.orderItem", b =>
                 {
-                    b.HasOne("WebApplication1.Models.Domain.item", "item")
-                        .WithMany("Walks")
+                    b.HasOne("WebApplication1.Models.Domain.Item", "item")
+                        .WithMany("orderItem")
                         .HasForeignKey("itemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -163,9 +163,9 @@ namespace WebApplication1.Migrations
                     b.Navigation("order");
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.Domain.item", b =>
+            modelBuilder.Entity("WebApplication1.Models.Domain.Item", b =>
                 {
-                    b.Navigation("Walks");
+                    b.Navigation("orderItem");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Domain.order", b =>

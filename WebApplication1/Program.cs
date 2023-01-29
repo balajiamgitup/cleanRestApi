@@ -16,6 +16,7 @@ builder.Services.AddDbContext<RestDbContext>(options =>
 });
 
 builder.Services.AddScoped<IitemRepository,ItemRepository>();
+builder.Services.AddScoped<IorderRepository, OrderRepository>();
 
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
